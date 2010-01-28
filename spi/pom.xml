@@ -1,0 +1,50 @@
+<!--
+  vi:ts=2:sw=2:expandtab
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <!-- Define Parent -->
+  <parent>
+    <groupId>org.jboss.ejb3.embedded</groupId>
+    <artifactId>embedded-build</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../build/pom.xml</relativePath>
+  </parent>
+
+  <!-- Maven POM Model Version -->
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- Artifact Information -->
+  <artifactId>embedded-spi</artifactId>
+  <packaging>jar</packaging>
+  <name>JBoss EJB 3.1+ Embedded SPI</name>
+  <description>Service Provider Interface for JBoss Embedded EJB 3.1+ Container</description>
+
+  <!-- Build Configuration -->
+  <build>
+  
+    
+  </build>
+  
+  <properties>
+  
+    <!-- Versioning -->
+
+  
+  </properties>
+
+  <dependencies>
+  
+    <!-- 
+    Dependencies: org.jboss.ejb3 
+    -->
+    
+    
+    <!-- 
+    Dependencies: External to EJB3 
+    -->
+    
+  </dependencies>
+</project>
