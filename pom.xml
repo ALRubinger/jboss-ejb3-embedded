@@ -9,7 +9,7 @@
   <parent>
     <groupId>org.jboss</groupId>
     <artifactId>jboss-parent</artifactId>
-    <version>4</version>
+    <version>5</version>
   </parent>
 
   <!-- Model Information -->
@@ -43,8 +43,11 @@
 
   <!-- Aggregate Modules -->
   <modules>
+    <module>api</module>
     <module>build</module>
-    <module>impl</module>
+    <module>impl-as</module>
+    <module>impl-base</module>
+    <module>impl-standalone</module>
     <module>spi</module>
   </modules>
 

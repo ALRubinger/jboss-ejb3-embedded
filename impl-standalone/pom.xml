@@ -17,10 +17,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <!-- Artifact Information -->
-  <artifactId>embedded-impl</artifactId>
+  <artifactId>embedded-impl-standalone</artifactId>
   <packaging>jar</packaging>
-  <name>JBoss EJB 3.1+ Embedded Implementation (Internals)</name>
-  <description>Implementation Support for Embedded EJB 3.1+ Container</description>
+  <name>JBoss EJB 3.1+ Embedded Implementation (Internals) for Standalone Environments</name>
+  <description>Implementation Support for Embedded EJB 3.1+ Container within a generic existing JVM</description>
 
   <!-- Build Configuration -->
   <build>
@@ -28,16 +28,28 @@
   </build>
   
   <properties>
-  
-    <!-- Versioning -->
+
+  <!-- Versioning -->
   
   </properties>
 
   <dependencies>
-  
-    <!-- 
-    Dependencies: org.jboss.ejb3 
-    -->
+    
+    <dependency>
+      <groupId>${groupId}</groupId>
+      <artifactId>embedded-impl-base</artifactId>
+      <version>${version}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.jboss.reloaded</groupId>
+      <artifactId>jboss-reloaded-vdf-bootstrap-minimal</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
     
   </dependencies>
 </project>

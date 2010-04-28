@@ -17,48 +17,53 @@
   <modelVersion>4.0.0</modelVersion>
 
   <!-- Artifact Information -->
-  <artifactId>embedded-spi</artifactId>
+  <artifactId>embedded-impl-base</artifactId>
   <packaging>jar</packaging>
-  <name>JBoss EJB 3.1+ Embedded SPI</name>
-  <description>Service Provider Interface for JBoss Embedded EJB 3.1+ Container</description>
+  <name>JBoss EJB 3.1+ Embedded Base Implementation (Internals)</name>
+  <description>Implementation Base Support for Embedded EJB 3.1+ Container</description>
 
   <!-- Build Configuration -->
   <build>
   
-    
   </build>
   
   <properties>
-  
-    <!-- Versioning -->
 
-  
   </properties>
 
   <dependencies>
   
-    <!-- 
-    Dependencies: org.jboss.ejb3 
-    -->
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>embedded-api</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.jboss.ejb3.embedded</groupId>
+      <artifactId>embedded-spi</artifactId>
+      <version>${version}</version>
     </dependency>
     
-    
-    <!-- 
-    Dependencies: External to EJB3 
-    -->
-    <dependency>
-      <groupId>org.jboss.kernel</groupId>
-      <artifactId>jboss-kernel</artifactId>
-      <scope>provided</scope>
-    </dependency>
     <dependency>
       <groupId>org.jboss</groupId>
       <artifactId>jboss-vfs</artifactId>
       <scope>provided</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.jboss.reloaded</groupId>
+      <artifactId>jboss-reloaded-vdf-bootstrap-minimal</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.jboss.spec.javax.ejb</groupId>
+      <artifactId>jboss-ejb-api_3.1_spec</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.jboss.shrinkwrap</groupId>
+      <artifactId>shrinkwrap-impl-base</artifactId>
+      <scope>test</scope>
     </dependency>
     
   </dependencies>

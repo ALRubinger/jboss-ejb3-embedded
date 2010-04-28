@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+  <!--
+    EJB/AS Adaptor
+-->
+<deployment xmlns="urn:jboss:bean-deployer:2.0">
+
+
+  <bean name="org.jboss.ejb3.EmbeddedEJBContainerASAdaptor"
+    class="org.jboss.ejb3.embedded.impl.as.EmbeddedEJBContainerASAdaptor">
+    <constructor>
+      <parameter name="server">
+        <inject />
+      </parameter>
+    </constructor>
+  </bean>
+
+</deployment>

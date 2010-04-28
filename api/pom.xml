@@ -17,10 +17,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <!-- Artifact Information -->
-  <artifactId>embedded-spi</artifactId>
+  <artifactId>embedded-api</artifactId>
   <packaging>jar</packaging>
-  <name>JBoss EJB 3.1+ Embedded SPI</name>
-  <description>Service Provider Interface for JBoss Embedded EJB 3.1+ Container</description>
+  <name>JBoss EJB 3.1+ Embedded API</name>
+  <description>Application Programming Interface for JBoss Embedded EJB 3.1+ Container</description>
 
   <!-- Build Configuration -->
   <build>
@@ -36,30 +36,19 @@
   </properties>
 
   <dependencies>
-  
-    <!-- 
-    Dependencies: org.jboss.ejb3 
-    -->
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>embedded-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    
     
     <!-- 
     Dependencies: External to EJB3 
     -->
     <dependency>
-      <groupId>org.jboss.kernel</groupId>
-      <artifactId>jboss-kernel</artifactId>
-      <scope>provided</scope>
+      <groupId>org.jboss.shrinkwrap</groupId>
+      <artifactId>shrinkwrap-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.jboss</groupId>
-      <artifactId>jboss-vfs</artifactId>
-      <scope>provided</scope>
+      <groupId>org.jboss.spec.javax.ejb</groupId>
+      <artifactId>jboss-ejb-api_3.1_spec</artifactId>
     </dependency>
+
     
   </dependencies>
 </project>
