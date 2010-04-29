@@ -65,6 +65,11 @@
       <artifactId>shrinkwrap-impl-base</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.jboss.shrinkwrap</groupId>
+      <artifactId>shrinkwrap-extension-vfs3</artifactId>
+      <scope>test</scope>
+    </dependency>
     
   </dependencies>
 </project>

@@ -22,6 +22,9 @@
 
 package org.jboss.ejb3.embedded.impl.base.scanner.filter;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -127,13 +130,42 @@ public class BundleSymbolicNameExclusionFilter implements ExclusionFilter
       }
 
       // Inspect the manifest contents
-      //TODO Left off here
+      final LineNumberReader reader;
+      try
+      {
+         reader = new LineNumberReader(new InputStreamReader(manifest.openStream()));
+         String line = null;
+         // Read each line
+         while ((line = reader.readLine()) != null)
+         {
+            // If this is the bundle symbolic name header
+            final String header = HEADER_BUNDLE_SYMBOLIC_NAME;
+            if (line.contains(header))
+            {
+               // Check if it also contains a matching value
+               for (final String exclusionValue : this.exclusionValues)
+               {
+                  if (line.contains(exclusionValue))
+                  {
+                     if (log.isTraceEnabled())
+                     {
+                        log.tracef("Configured exclusion value \"" + exclusionValue
+                              + "\" encountered in manifest header \"" + header + "\"; skipping " + file);
+                     }
+                     // Skip
+                     return true;
+                  }
+               }
+            }
+         }
+      }
+      catch (final IOException ioe)
+      {
+         throw new RuntimeException("Could not read contents of " + file, ioe);
+      }
 
       // No conditions met
       return false;
    }
 
-   //-------------------------------------------------------------------------------------||
-   // Internal Helper Methods ------------------------------------------------------------||
-   //-------------------------------------------------------------------------------------||
 }

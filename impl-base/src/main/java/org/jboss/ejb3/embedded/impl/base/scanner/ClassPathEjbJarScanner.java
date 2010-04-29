@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -36,6 +37,8 @@ import javax.ejb.Singleton;
 import javax.ejb.Stateful;
 import javax.ejb.Stateless;
 
+import org.jboss.ejb3.embedded.impl.base.scanner.filter.BundleSymbolicNameExclusionFilter;
+import org.jboss.ejb3.embedded.spi.scanner.filter.ExclusionFilter;
 import org.jboss.logging.Logger;
 import org.jboss.vfs.TempFileProvider;
 import org.jboss.vfs.VFS;
@@ -56,16 +59,14 @@ public class ClassPathEjbJarScanner
    /*
     * This is an intentionally naive implementation which essentially
     * amounts to junkware.  It gets us to the next phases of development, 
-    * but isn't intended to be the final solution.
+    * but isn't intended to be the final solution.  For starters it's a static utility.
     * 
     * Open issues:
     * 
     * 1) Don't load all Classes to look for annotations.  Vie for ASM or Javassist (or 
     * other bytecode analyzer).  Or pass through an isolated VDF Deployer chain and let the
     * deployers figure out what the eligible modules are
-    * 2) Extract out a configurable set of ExclusionFilters which can determine if a given 
-    * root should be skipped (ie. for JUnit or JBossAS binaries)
-    * 3) Define a configurable ScheduledExecutorService to back the TempFileProvider
+    * 2) Define a configurable ScheduledExecutorService to back the TempFileProvider
     * used to mount ZIP VFS roots.  If we go the deployer chain route as noted by 1) this 
     * won't be necessary 
     */
@@ -120,6 +121,17 @@ public class ClassPathEjbJarScanner
    // this one is never shut down cleanly
    private static final ScheduledExecutorService ses = Executors.newScheduledThreadPool(Runtime.getRuntime()
          .availableProcessors());
+
+   /**
+    * Configured exclusion filters
+    * TODO Shouldn't be hardcoded, but available via user configuration
+    */
+   private static final List<ExclusionFilter> exclusionFilters;
+   static
+   {
+      exclusionFilters = new ArrayList<ExclusionFilter>();
+      exclusionFilters.add(new BundleSymbolicNameExclusionFilter("org.eclipse", "org.junit"));
+   }
 
    //-------------------------------------------------------------------------------------||
    // Constructor ------------------------------------------------------------------------||
@@ -206,6 +218,7 @@ public class ClassPathEjbJarScanner
          // If the file exists
          if (file.exists())
          {
+
             // Mount Exploded dir
             if (file.isDirectory())
             {
@@ -223,8 +236,11 @@ public class ClassPathEjbJarScanner
             // No conditions met
             else
             {
+               // So it's obvious if we've got something we didn't properly mount
+               log.warn("Encountered unknown file type, skipping: " + file);
                return false;
             }
+
          }
          // Not a real file
          else
@@ -233,14 +249,23 @@ public class ClassPathEjbJarScanner
             return false;
          }
 
-      }
-      catch (final IOException e)
-      {
-         throw new RuntimeException("Could not mount file from ClassPath for EJB JAR module scanning", e);
-      }
+         /*
+          * See if we've been configured to skip this file
+          */
+         for (final ExclusionFilter exclusionFilter : exclusionFilters)
+         {
+            // If we should exclude this
+            if (exclusionFilter.exclude(file))
+            {
+               // Exclude from further processing
+               if (log.isTraceEnabled())
+               {
+                  log.tracef("%s matched %s for exclusion; skipping", exclusionFilter, file);
+               }
+               return false;
+            }
+         }
 
-      try
-      {
          /*
           * Directories and real JARs are handled the same way in VFS, so just do
           * one check and skip logic to test isDirectory or not
@@ -265,6 +290,11 @@ public class ClassPathEjbJarScanner
 
          // Return
          return false;
+
+      }
+      catch (final IOException e)
+      {
+         throw new RuntimeException("Could not mount file from ClassPath for EJB JAR module scanning", e);
       }
       finally
       {
@@ -278,6 +308,7 @@ public class ClassPathEjbJarScanner
             log.warn("Could not close handle to mounted " + file, e);
          }
       }
+
    }
 
    /**
@@ -330,7 +361,7 @@ public class ClassPathEjbJarScanner
             final String className = childName.substring(0, childName.length() - EXTENSION_CLASS.length()).replace('/',
                   '.');
 
-            // Here's the naughty part; loading the Class (which we really don't need to do, just inspect for annotations)
+            // Here's the naughty part; loading the Class (which we really don't need to do at all, just inspect for annotations)
             Class<?> clazz = null;
             try
             {
@@ -342,11 +373,10 @@ public class ClassPathEjbJarScanner
             }
             catch (final NoClassDefFoundError ncdfe)
             {
-               // Ugly ugly hack, Eclipse IDE JUnit runner puts stuff on the CP which can't be loaded
-               // This will be solved by a configurable exclusion filter so we don't look in the root
-               // in the first place.
-               log.warnf("Dev Hack Alert: Ignoring class on ClassPath which can't be loaded due to %s", ncdfe
-                     .toString());
+               // Ugly hack used to identify the stuff for which we need to configure an exclusion filter
+               log.warnf(
+                     "Dev Hack Alert: Ignoring class on ClassPath which can't be loaded due to %s while loading %s; "
+                           + "configure an exclusion filter so %s is not processed", ncdfe.toString(), className, root);
             }
 
             // Determine if we have a class with an EJB component annotation 

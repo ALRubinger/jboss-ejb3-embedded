@@ -44,7 +44,9 @@ public interface ExclusionFilter
     * Returns whether this {@link VirtualFile} should be
     * excluded from scanning for EJB resources.  The criteria
     * whereby a file is excluded is up to the implementation.
+    * @param The file to inspect for exclusion properties
+    * @throws IllegalArgumentException If the file is not specified
     */
-   boolean exclude(VirtualFile file);
+   boolean exclude(VirtualFile file) throws IllegalArgumentException;
 
 }

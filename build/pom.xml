@@ -179,6 +179,11 @@
         <artifactId>shrinkwrap-impl-base</artifactId>
         <version>${version.org.jboss.shrinkwrap}</version>
       </dependency>
+      <dependency>
+        <groupId>org.jboss.shrinkwrap</groupId>
+        <artifactId>shrinkwrap-extension-vfs3</artifactId>
+        <version>${version.org.jboss.shrinkwrap}</version>
+      </dependency>
 
     </dependencies>
   </dependencyManagement>
