@@ -37,6 +37,7 @@ import org.jboss.logging.Logger;
  * into an encapsulated {@link JBossEmbeddedContainerStartupParams} object which 
  * will be used to instantiate the real container provider impl.
  *
+ * @author <a href="mailto:cdewolf@redhat.com">Carlo de Wolf</a>
  * @author <a href="mailto:andrew.rubinger@jboss.org">ALR</a>
  * @version $Revision: $
  */
@@ -73,7 +74,7 @@ public abstract class JBossEJBContainerProviderBase implements EJBContainerProvi
       /*
        * Ensure we qualify as a valid implementation class
        * 1) Our impl class is equal to the value of "javax.ejb.embeddable.initial"
-       * 2) No "avax.ejb.embeddable.provider" property was specified
+       * 2) No "javax.ejb.embeddable.provider" property was specified
        * (Note: http://wiki.jcp.org/boards/index.php?t=4468) 
        */
       final String providerProp = EJBContainer.PROVIDER;
