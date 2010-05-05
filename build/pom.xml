@@ -28,7 +28,7 @@
 
     <!-- Versioning -->
     <version.junit_junit>4.7</version.junit_junit>
-    <version.org.jboss.reloaded_jboss.reloaded.vdf.bootstrap.minimal>0.1.1</version.org.jboss.reloaded_jboss.reloaded.vdf.bootstrap.minimal>
+    <version.org.jboss.reloaded_jboss.reloaded.vdf.bootstrap.minimal>0.1.2</version.org.jboss.reloaded_jboss.reloaded.vdf.bootstrap.minimal>
     <version.org.jboss.kernel>2.2.0.Alpha9</version.org.jboss.kernel>
     <version.org.jboss.spec.javax.ejb_jboss-ejb-api_3.1_spec>1.0.0.Beta2</version.org.jboss.spec.javax.ejb_jboss-ejb-api_3.1_spec>
     <version.org.jboss.logging>2.2.0.CR1</version.org.jboss.logging>

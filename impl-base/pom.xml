@@ -28,6 +28,10 @@
   </build>
   
   <properties>
+  
+    <!-- Versioning -->
+     <version.org.jboss.threads>2.0.0.CR4</version.org.jboss.threads>
+     
 
   </properties>
 
@@ -70,6 +74,28 @@
       <artifactId>shrinkwrap-extension-vfs3</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <!-- JBoss Threads (only needed for as long as we've got ShrinkWrapDeployer in use) -->
+    <dependency>
+      <groupId>org.jboss.threads</groupId>
+      <artifactId>jboss-threads</artifactId>
+      <version>${version.org.jboss.threads}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.threads</groupId>
+      <artifactId>jboss-threads-metadata</artifactId>
+      <version>${version.org.jboss.threads}</version>
+      <scope>test</scope>
+    </dependency>
     
+    <dependency>
+      <groupId>org.jboss.naming</groupId>
+      <artifactId>jnpserver</artifactId>
+      <version>5.0.0.CR1</version>
+      <scope>test</scope>
+    </dependency>
+    
+
   </dependencies>
 </project>

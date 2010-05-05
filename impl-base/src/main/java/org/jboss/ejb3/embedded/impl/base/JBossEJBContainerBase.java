@@ -45,6 +45,7 @@ import org.jboss.ejb3.embedded.api.JBossEJBContainer;
 import org.jboss.ejb3.embedded.impl.base.scanner.ClassPathEjbJarScanner;
 import org.jboss.kernel.Kernel;
 import org.jboss.logging.Logger;
+import org.jboss.reloaded.shrinkwrap.api.ShrinkWrapDeployer;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.vfs.VFS;
 import org.jboss.vfs.VirtualFile;
@@ -93,6 +94,12 @@ public abstract class JBossEJBContainerBase extends EJBContainer implements JBos
     */
    private final Set<Deployment> deployments;
 
+   /**
+    * @see @see http://community.jboss.org/message/540998
+    */
+   @Deprecated
+   private final ShrinkWrapDeployer shrinkWrapDeployer;
+
    //-------------------------------------------------------------------------------------||
    // Constructor ------------------------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
@@ -111,6 +118,11 @@ public abstract class JBossEJBContainerBase extends EJBContainer implements JBos
             MC_BIND_NAME_MAIN_DEPLOYER).getTarget();
       assert deployer != null : "Main Deployer found in the Kernel was null";
 
+      // Obtain ShrinkWrapDeployer
+      final ShrinkWrapDeployer shrinkWrapDeployer = (ShrinkWrapDeployer) kernel.getController().getContextByClass(
+            ShrinkWrapDeployer.class).getTarget();
+      assert shrinkWrapDeployer != null : "ShrinkWrapDeployer found in Kernel was null";
+
       log.info("Started JBoss Embedded " + EJBContainer.class.getSimpleName());
       log.info("Modules for deployment: " + Arrays.asList(modules));
 
@@ -118,6 +130,7 @@ public abstract class JBossEJBContainerBase extends EJBContainer implements JBos
       this.mcServer = server;
       this.deployer = deployer;
       this.deployments = new HashSet<Deployment>();
+      this.shrinkWrapDeployer = shrinkWrapDeployer;
    }
 
    protected JBossEJBContainerBase(final Map<?, ?> properties, final MCServer server)
@@ -245,10 +258,24 @@ public abstract class JBossEJBContainerBase extends EJBContainer implements JBos
     * @see org.jboss.ejb3.embedded.api.JBossEJBContainer#deploy(org.jboss.shrinkwrap.api.Archive<?>[])
     */
    @Override
-   public void deploy(final Archive<?>... archives) throws EJBDeploymentException
+   public void deploy(final Archive<?>... archives) throws EJBDeploymentException, IllegalArgumentException
    {
-      //TODO
-      throw new UnsupportedOperationException("Not yet implemented; to delegate to the Reloaded ShrinkWrapDeployer");
+      // Precondition checks
+      if (archives == null)
+      {
+         throw new IllegalArgumentException("archives must be supplied");
+      }
+
+      // Deploy
+      try
+      {
+         shrinkWrapDeployer.deploy(archives);
+      }
+      catch (final DeploymentException e)
+      {
+         // Translate
+         throw EJBDeploymentException.newInstance("Could not deploy " + Arrays.asList(archives), e);
+      }
    }
 
    /**
@@ -256,10 +283,24 @@ public abstract class JBossEJBContainerBase extends EJBContainer implements JBos
     * @see org.jboss.ejb3.embedded.api.JBossEJBContainer#undeploy(org.jboss.shrinkwrap.api.Archive<?>[])
     */
    @Override
-   public void undeploy(final Archive<?>... archives) throws EJBDeploymentException
+   public void undeploy(final Archive<?>... archives) throws EJBDeploymentException, IllegalArgumentException
    {
-      //TODO
-      throw new UnsupportedOperationException("Not yet implemented; to delegate to the Reloaded ShrinkWrapDeployer");
+      // Precondition checks
+      if (archives == null)
+      {
+         throw new IllegalArgumentException("archives must be supplied");
+      }
+
+      // Undeploy
+      try
+      {
+         shrinkWrapDeployer.undeploy(archives);
+      }
+      catch (final DeploymentException e)
+      {
+         // Translate
+         throw EJBDeploymentException.newInstance("Could not undeploy " + Arrays.asList(archives), e);
+      }
    }
 
    /**
@@ -280,22 +321,15 @@ public abstract class JBossEJBContainerBase extends EJBContainer implements JBos
    @Override
    public Context getContext()
    {
-      //TODO
-      // We could return this assuming the naming system is up, as one idea (probably cache the context)
+      // We could return this assuming the naming system is up, as one idea
       try
       {
-         new InitialContext();
+         return new InitialContext();
       }
       catch (final NamingException e)
       {
          throw new RuntimeException("Could not create new naming context", e);
       }
-      // Just throw an exception for now
-      throw new UnsupportedOperationException("IMPLEMENT");
    }
-
-   //-------------------------------------------------------------------------------------||
-   // Lifecycle Methods ------------------------------------------------------------------||
-   //-------------------------------------------------------------------------------------||
 
 }

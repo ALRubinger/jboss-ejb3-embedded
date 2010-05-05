@@ -29,14 +29,19 @@ import java.util.logging.Logger;
 
 import javax.ejb.embeddable.EJBContainer;
 
+import org.jboss.beans.metadata.plugins.builder.BeanMetaDataBuilderFactory;
+import org.jboss.beans.metadata.spi.builder.BeanMetaDataBuilder;
 import org.jboss.bootstrap.api.descriptor.BootstrapDescriptor;
 import org.jboss.bootstrap.api.lifecycle.LifecycleState;
 import org.jboss.bootstrap.api.mc.server.MCServer;
 import org.jboss.bootstrap.api.mc.server.MCServerFactory;
 import org.jboss.deployers.client.spi.Deployment;
 import org.jboss.deployers.client.spi.main.MainDeployer;
+import org.jboss.deployers.spi.DeploymentException;
 import org.jboss.deployers.vfs.spi.client.VFSDeploymentFactory;
 import org.jboss.reloaded.api.ReloadedDescriptors;
+import org.jboss.reloaded.shrinkwrap.api.ShrinkWrapDeployer;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.vfs.VFS;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -135,6 +140,19 @@ public class EmbeddedEJBContainerExistingMCServerIntegrationUnitTest
       // Start
       server.start();
 
+      // Install a mock ShrinkWrapDeployer (we don't need a real one here)
+      final BeanMetaDataBuilder builder = BeanMetaDataBuilderFactory.createBuilder(
+            MockShrinkWrapDeployer.class.getName()).setName(MockShrinkWrapDeployer.class.getSimpleName());
+      try
+      {
+         server.getKernel().getController().install(builder.getBeanMetaData());
+      }
+      catch (final Throwable e)
+      {
+         throw new Exception("Could not install ShrinkWrapDeployer", e);
+      }
+
+      // Install the AS / EJB Embedded Adaptor
       final URL codebase = EmbeddedEJBContainerExistingMCServerIntegrationUnitTest.class.getProtectionDomain()
             .getCodeSource().getLocation();
       final URL classes = new URL(codebase, "../classes/");
@@ -180,9 +198,32 @@ public class EmbeddedEJBContainerExistingMCServerIntegrationUnitTest
    {
       final EJBContainer container = EJBContainer.createEJBContainer();
       Assert.assertNotNull("Container was null", container);
-
       Assert.assertTrue("Container is not of expected type", container instanceof JBossASEmbeddedEJBContainer);
-      JBossASEmbeddedEJBContainer jbossContainer = (JBossASEmbeddedEJBContainer) container;
+   }
+
+   //-------------------------------------------------------------------------------------||
+   // Internal Helpers -------------------------------------------------------------------||
+   //-------------------------------------------------------------------------------------||
+
+   /**
+    * Mock NOOP {@link ShrinkWrapDeployer} implementation
+    */
+   public static final class MockShrinkWrapDeployer implements ShrinkWrapDeployer
+   {
+
+      @Override
+      public void deploy(final Archive<?>... archives) throws IllegalArgumentException, DeploymentException
+      {
+         //NO-OP
+
+      }
+
+      @Override
+      public void undeploy(final Archive<?>... archives) throws IllegalArgumentException, DeploymentException
+      {
+         //NO-OP
+
+      }
 
    }
 

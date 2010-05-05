@@ -57,17 +57,19 @@ public interface JBossEJBContainer
    void close();
 
    /**
-    * Deploys the specified {@link Archive}s into the container
-    * @param archive
-    * @throws EJBDeploymentException
+    * Deploys the specified {@link Archive}s into the container. 
+    * @param archives
+    * @throws EJBDeploymentException If an error occurred in deployment
+    * @throws IllegalArgumentException If archives is null
     */
-   void deploy(Archive<?>... archives) throws EJBDeploymentException;
+   void deploy(Archive<?>... archives) throws EJBDeploymentException, IllegalArgumentException;
 
    /**
-    * Undeploys the specified {@link Archive}s from the container
-    * @param archive
-    * @throws EJBDeploymentException
+    * Undeploys the specified {@link Archive}s from the container.  
+    * @param archives
+    * @throws EJBDeploymentException If an error occurred in deployment
+    * @throws IllegalArgumentException If archives is null
     */
-   void undeploy(Archive<?>... archives) throws EJBDeploymentException;
+   void undeploy(Archive<?>... archives) throws EJBDeploymentException, IllegalArgumentException;
 
 }
