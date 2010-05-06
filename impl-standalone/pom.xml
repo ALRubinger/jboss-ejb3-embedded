@@ -8,7 +8,7 @@
   <!-- Define Parent -->
   <parent>
     <groupId>org.jboss.ejb3.embedded</groupId>
-    <artifactId>embedded-build</artifactId>
+    <artifactId>jboss-ejb3-embedded-build</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <relativePath>../build/pom.xml</relativePath>
   </parent>
@@ -17,7 +17,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <!-- Artifact Information -->
-  <artifactId>embedded-impl-standalone</artifactId>
+  <artifactId>jboss-ejb3-embedded-impl-standalone</artifactId>
   <packaging>jar</packaging>
   <name>JBoss EJB 3.1+ Embedded Implementation (Internals) for Standalone Environments</name>
   <description>Implementation Support for Embedded EJB 3.1+ Container within a generic existing JVM</description>
@@ -37,7 +37,7 @@
     
     <dependency>
       <groupId>${groupId}</groupId>
-      <artifactId>embedded-impl-base</artifactId>
+      <artifactId>jboss-ejb3-embedded-impl-base</artifactId>
       <version>${version}</version>
     </dependency>
     

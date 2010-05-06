@@ -17,7 +17,7 @@
 
   <!-- Artifact Configuration -->
   <groupId>org.jboss.ejb3.embedded</groupId>
-  <artifactId>embedded-build</artifactId>
+  <artifactId>jboss-ejb3-embedded-build</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <name>JBoss EJB 3.1+ Embedded Build</name>
   <description>Centralized Build Configuration for JBoss Embedded EJB 3.1+ Container Support</description>
