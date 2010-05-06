@@ -3,13 +3,15 @@
   <!--
     EJB/AS Adaptor
 -->
-<deployment xmlns="urn:jboss:bean-deployer:2.0">
+<deployment xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="urn:jboss:bean-deployer:2.0 bean-deployer_2_0.xsd"
+  xmlns="urn:jboss:bean-deployer:2.0">
 
 
   <bean name="org.jboss.ejb3.EmbeddedEJBContainerASAdaptor"
     class="org.jboss.ejb3.embedded.impl.as.EmbeddedEJBContainerASAdaptor">
     <constructor>
-      <parameter name="server">
+      <parameter class="org.jboss.bootstrap.api.mc.server.MCServer">
         <inject />
       </parameter>
     </constructor>

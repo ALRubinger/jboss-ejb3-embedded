@@ -29,7 +29,7 @@ package org.jboss.ejb3.embedded.api;
  * @author <a href="mailto:andrew.rubinger@jboss.org">ALR</a>
  * @version $Revision: $
  */
-public class EJBDeploymentException extends Exception
+public class EJBDeploymentException extends RuntimeException
 {
 
    //-------------------------------------------------------------------------------------||
