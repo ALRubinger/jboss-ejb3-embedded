@@ -34,6 +34,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.jboss.bootstrap.api.mc.server.MCBasedServer;
 import org.jboss.bootstrap.api.mc.server.MCServer;
 import org.jboss.deployers.client.spi.Deployment;
 import org.jboss.deployers.client.spi.main.MainDeployer;
@@ -87,7 +88,7 @@ public abstract class JBossEJBContainerBase extends EJBContainer implements JBos
    /**
     * Underlying MC Server
     */
-   private final MCServer mcServer;
+   private final MCBasedServer<?, ?> mcServer;
 
    /**
     * All deployments currently installed via this container
@@ -104,7 +105,7 @@ public abstract class JBossEJBContainerBase extends EJBContainer implements JBos
    // Constructor ------------------------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
 
-   protected JBossEJBContainerBase(final Map<?, ?> properties, final String[] modules, final MCServer server)
+   protected JBossEJBContainerBase(final Map<?, ?> properties, final String[] modules, final MCBasedServer<?, ?> server)
    {
       // Precondition checks
       if (server == null)
@@ -309,7 +310,7 @@ public abstract class JBossEJBContainerBase extends EJBContainer implements JBos
     * 
     * @return
     */
-   protected MCServer getMCServer()
+   protected MCBasedServer<?, ?> getMCServer()
    {
       return mcServer;
    }

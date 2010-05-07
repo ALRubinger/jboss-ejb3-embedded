@@ -140,6 +140,19 @@ public class EmbeddedEJBContainerExistingMCServerIntegrationUnitTest
       // Start
       server.start();
 
+      // Install the server into MC again as another alias (AS does not have the type unique, so we ensure
+      // that we're correctly doing this by name)
+      final BeanMetaDataBuilder bmdb = BeanMetaDataBuilderFactory.createBuilder("JBossServer-alias", server.getClass()
+            .getName());
+      try
+      {
+         server.getKernel().getController().install(bmdb.getBeanMetaData());
+      }
+      catch (final Throwable e1)
+      {
+         throw new RuntimeException("Could not install JBossServer as alias", e1);
+      }
+
       // Install a mock ShrinkWrapDeployer (we don't need a real one here)
       final BeanMetaDataBuilder builder = BeanMetaDataBuilderFactory.createBuilder(
             MockShrinkWrapDeployer.class.getName()).setName(MockShrinkWrapDeployer.class.getSimpleName());

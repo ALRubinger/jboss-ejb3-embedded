@@ -11,8 +11,8 @@
   <bean name="org.jboss.ejb3.EmbeddedEJBContainerASAdaptor"
     class="org.jboss.ejb3.embedded.impl.as.EmbeddedEJBContainerASAdaptor">
     <constructor>
-      <parameter class="org.jboss.bootstrap.api.mc.server.MCServer">
-        <inject />
+      <parameter class="org.jboss.bootstrap.api.mc.server.MCBasedServer">
+        <inject bean="JBossServer"/>
       </parameter>
     </constructor>
   </bean>

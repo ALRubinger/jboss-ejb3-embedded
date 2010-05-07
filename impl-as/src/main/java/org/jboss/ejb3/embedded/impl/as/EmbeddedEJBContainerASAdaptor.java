@@ -24,6 +24,7 @@ package org.jboss.ejb3.embedded.impl.as;
 import javax.ejb.embeddable.EJBContainer;
 
 import org.jboss.beans.metadata.api.annotations.Inject;
+import org.jboss.bootstrap.api.mc.server.MCBasedServer;
 import org.jboss.bootstrap.api.mc.server.MCServer;
 
 /**
@@ -51,7 +52,7 @@ public final class EmbeddedEJBContainerASAdaptor
     * {@link MCServer} instance handling all wiring of components which together
     * will compose the JBoss Embedded EJB3 implementation.
     */
-   private static volatile MCServer server;
+   private static volatile MCBasedServer<?, ?> server;
 
    //-------------------------------------------------------------------------------------||
    // Constructor ------------------------------------------------------------------------||
@@ -66,7 +67,7 @@ public final class EmbeddedEJBContainerASAdaptor
     * @throws IllegalArgumentException If the server is not specified
     * @throws IllegalStateException If this has already been called
     */
-   public EmbeddedEJBContainerASAdaptor(@Inject final MCServer server) throws IllegalStateException,
+   public EmbeddedEJBContainerASAdaptor(@Inject final MCBasedServer<?, ?> server) throws IllegalStateException,
          IllegalArgumentException
    {
       // So that we can't reset the MC Server
@@ -93,7 +94,7 @@ public final class EmbeddedEJBContainerASAdaptor
     * 
     * @throws IllegalStateException If the {@link MCServer} has not yet been set
     */
-   static MCServer getMCServer() throws IllegalStateException
+   static MCBasedServer<?, ?> getMCServer() throws IllegalStateException
    {
       // Precondition checks
       if (server == null)
@@ -113,7 +114,8 @@ public final class EmbeddedEJBContainerASAdaptor
     * @throws IllegalStateException If the {@link MCServer} has already been set
     * @throws IllegalArgumentException If the specified {@link MCServer} is null
     */
-   private static void setMCServer(final MCServer server) throws IllegalStateException, IllegalArgumentException
+   private static void setMCServer(final MCBasedServer<?, ?> server) throws IllegalStateException,
+         IllegalArgumentException
    {
       // Precondition checks
       if (server == null)
