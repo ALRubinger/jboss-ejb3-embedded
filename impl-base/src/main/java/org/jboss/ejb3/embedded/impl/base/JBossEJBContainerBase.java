@@ -46,8 +46,8 @@ import org.jboss.ejb3.embedded.api.JBossEJBContainer;
 import org.jboss.ejb3.embedded.impl.base.scanner.ClassPathEjbJarScanner;
 import org.jboss.kernel.Kernel;
 import org.jboss.logging.Logger;
-import org.jboss.reloaded.shrinkwrap.api.ShrinkWrapDeployer;
 import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.vdf.api.ShrinkWrapDeployer;
 import org.jboss.vfs.VFS;
 import org.jboss.vfs.VirtualFile;
 

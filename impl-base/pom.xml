@@ -74,8 +74,13 @@
       <artifactId>shrinkwrap-extension-vfs3</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.jboss.shrinkwrap</groupId>
+      <artifactId>shrinkwrap-extension-vdf</artifactId>
+      <scope>provided</scope>
+    </dependency>
 
-    <!-- JBoss Threads (only needed for as long as we've got ShrinkWrapDeployer in use) -->
+    <!-- JBoss Threads (needed for as long as we've got ShrinkWrapDeployer in use) -->
     <dependency>
       <groupId>org.jboss.threads</groupId>
       <artifactId>jboss-threads</artifactId>

@@ -35,6 +35,7 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.jboss.bootstrap.api.descriptor.BootstrapDescriptor;
+import org.jboss.bootstrap.api.descriptor.UrlBootstrapDescriptor;
 import org.jboss.bootstrap.api.mc.server.MCServer;
 import org.jboss.bootstrap.api.mc.server.MCServerFactory;
 import org.jboss.dependency.spi.ControllerContext;
@@ -42,11 +43,10 @@ import org.jboss.ejb3.embedded.api.EJBDeploymentException;
 import org.jboss.ejb3.embedded.api.JBossEJBContainer;
 import org.jboss.kernel.spi.dependency.KernelController;
 import org.jboss.reloaded.api.ReloadedDescriptors;
-import org.jboss.reloaded.shrinkwrap.api.ShrinkWrapDeployer;
-import org.jboss.reloaded.shrinkwrap.api.ShrinkWrapReloadedDescriptors;
 import org.jboss.shrinkwrap.api.Asset;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.jboss.shrinkwrap.vdf.api.ShrinkWrapDeployer;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -96,8 +96,8 @@ public class JBossEJBContainerBaseUnitTest
       descriptors.add(ReloadedDescriptors.getClassLoadingDescriptor());
       descriptors.add(ReloadedDescriptors.getVdfDescriptor());
       descriptors.add(ReloadedDescriptors.getThreadsDescriptor());
-      descriptors.add(ShrinkWrapReloadedDescriptors.getTempFileProviderDescriptor());
-      descriptors.add(ShrinkWrapReloadedDescriptors.getShrinkWrapDeployerDescriptor());
+      descriptors.add(new UrlBootstrapDescriptor(Thread.currentThread().getContextClassLoader().getResource(
+            "shrinkwrap-deployer-jboss-beans.xml")));
 
       // Start
       server.start();
