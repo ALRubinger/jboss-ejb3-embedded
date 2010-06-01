@@ -33,8 +33,8 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import org.jboss.ejb3.embedded.spi.scanner.filter.ExclusionFilter;
 import org.jboss.logging.Logger;
-import org.jboss.shrinkwrap.api.Asset;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.vfs3.ArchiveFileSystem;
 import org.jboss.vfs.TempFileProvider;
@@ -173,7 +173,7 @@ public class BundleSymbolicNameExclusionFilterUnitTest
       assert filterConfig != null : "filterConfig must be specified";
 
       // Create the archive
-      final JavaArchive archive = ShrinkWrap.create("manifest.jar", JavaArchive.class).addManifestResource(new Asset()
+      final JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "manifest.jar").addManifestResource(new Asset()
       {
 
          @Override

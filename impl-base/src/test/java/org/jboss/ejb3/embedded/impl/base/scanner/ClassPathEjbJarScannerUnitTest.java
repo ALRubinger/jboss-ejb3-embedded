@@ -37,10 +37,9 @@ import javax.ejb.Singleton;
 import javax.ejb.Stateful;
 import javax.ejb.Stateless;
 
-import org.jboss.ejb3.embedded.impl.base.scanner.ClassPathEjbJarScanner;
 import org.jboss.logging.Logger;
-import org.jboss.shrinkwrap.api.Asset;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.exporter.ExplodedExporter;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -74,39 +73,14 @@ public class ClassPathEjbJarScannerUnitTest
    private static final String SYS_PROP_KEY_CLASS_PATH = "java.class.path";
 
    /**
-    * EJB JAR containing @Stateless
-    */
-   private static final String NAME_JAR_SLSB = "slsb.jar";
-
-   /**
-    * EJB JAR containing @Stateful
-    */
-   private static final String NAME_JAR_SFSB = "sfsb.jar";
-
-   /**
-    * EJB JAR containing @Singleton
-    */
-   private static final String NAME_JAR_SINGLETON = "singleton.jar";
-
-   /**
-    * EJB JAR containing @MessageDriven
-    */
-   private static final String NAME_JAR_MDB = "mdb.jar";
-
-   /**
-    * EJB JAR containing a POJO with no descriptor (should not be detected as an EJB Module)
-    */
-   private static final String NAME_JAR_POJO = "pojo.jar";
-
-   /**
-    * EJB JAR containing a POJO with a descriptor
-    */
-   private static final String NAME_JAR_POJO_WITH_DESCRIPTOR = "descriptor.jar";
-
-   /**
     * The ClassPath entries expected to be reported as modules
     */
    private static final Collection<String> expectedEjbJarClassPathEntries = new ArrayList<String>();
+
+   /**
+    * Name of a JAR containing a POJO deployment
+    */
+   private static final String NAME_JAR_POJO = "pojo.jar";
 
    //-------------------------------------------------------------------------------------||
    // Lifecycle --------------------------------------------------------------------------||
@@ -122,22 +96,21 @@ public class ClassPathEjbJarScannerUnitTest
 
       // Create a bunch of test Archives
       final Collection<JavaArchive> archives = new ArrayList<JavaArchive>();
-      archives.add(ShrinkWrap.create(NAME_JAR_SLSB, JavaArchive.class).addClass(Slsb.class));
-      archives.add(ShrinkWrap.create(NAME_JAR_SFSB, JavaArchive.class).addClass(Sfsb.class));
-      archives.add(ShrinkWrap.create(NAME_JAR_SINGLETON, JavaArchive.class).addClass(Singleton1.class));
-      archives.add(ShrinkWrap.create(NAME_JAR_MDB, JavaArchive.class).addClass(Mdb.class));
-      archives.add(ShrinkWrap.create(NAME_JAR_POJO, JavaArchive.class).addClass(Pojo.class));
-      archives.add(ShrinkWrap.create(NAME_JAR_POJO_WITH_DESCRIPTOR, JavaArchive.class).addClass(Pojo.class)
-            .addManifestResource(new Asset()
-            {
+      archives.add(ShrinkWrap.create(JavaArchive.class).addClass(Slsb.class));
+      archives.add(ShrinkWrap.create(JavaArchive.class).addClass(Sfsb.class));
+      archives.add(ShrinkWrap.create(JavaArchive.class).addClass(Singleton1.class));
+      archives.add(ShrinkWrap.create(JavaArchive.class).addClass(Mdb.class));
+      archives.add(ShrinkWrap.create(JavaArchive.class, NAME_JAR_POJO).addClass(Pojo.class));
+      archives.add(ShrinkWrap.create(JavaArchive.class).addClass(Pojo.class).addManifestResource(new Asset()
+      {
 
-               @Override
-               public InputStream openStream()
-               {
-                  return new ByteArrayInputStream(new byte[]
-                  {});
-               }
-            }, "ejb-jar.xml"));
+         @Override
+         public InputStream openStream()
+         {
+            return new ByteArrayInputStream(new byte[]
+            {});
+         }
+      }, "ejb-jar.xml"));
 
       // Flush these out to disk in both JAR and Exploded format
       final URL shrinkwrapOutputUrl = new URL(ClassPathEjbJarScannerUnitTest.class.getProtectionDomain()

@@ -71,11 +71,6 @@ public abstract class JBossEJBContainerBase extends EJBContainer implements JBos
     */
    private static final Logger log = Logger.getLogger(JBossEJBContainerBase.class);
 
-   /**
-    * Name in MC under which the {@link MainDeployer} is bound
-    */
-   private static final String MC_BIND_NAME_MAIN_DEPLOYER = "MainDeployer";
-
    //-------------------------------------------------------------------------------------||
    // Instance Members -------------------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
@@ -105,38 +100,39 @@ public abstract class JBossEJBContainerBase extends EJBContainer implements JBos
    // Constructor ------------------------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
 
-   protected JBossEJBContainerBase(final Map<?, ?> properties, final String[] modules, final MCBasedServer<?, ?> server)
+   protected JBossEJBContainerBase(final Map<?, ?> properties, final MCBasedServer<?, ?> server, final String[] modules)
    {
       // Precondition checks
       if (server == null)
       {
          throw new IllegalArgumentException("MC Server must be specified");
       }
-
-      // Obtain MainDeployer
+      // Get Kernel
       final Kernel kernel = server.getKernel();
-      final MainDeployer deployer = (MainDeployer) kernel.getController().getInstalledContext(
-            MC_BIND_NAME_MAIN_DEPLOYER).getTarget();
-      assert deployer != null : "Main Deployer found in the Kernel was null";
 
       // Obtain ShrinkWrapDeployer
       final ShrinkWrapDeployer shrinkWrapDeployer = (ShrinkWrapDeployer) kernel.getController().getContextByClass(
             ShrinkWrapDeployer.class).getTarget();
       assert shrinkWrapDeployer != null : "ShrinkWrapDeployer found in Kernel was null";
 
+      // Obtain MainDeployer
+      final MainDeployer mainDeployer = (MainDeployer) kernel.getController().getContextByClass(MainDeployer.class)
+            .getTarget();
+      assert mainDeployer != null : "MainDeployer found in Kernel was null";
+
       log.info("Started JBoss Embedded " + EJBContainer.class.getSimpleName());
       log.info("Modules for deployment: " + Arrays.asList(modules));
 
       // Set
       this.mcServer = server;
-      this.deployer = deployer;
+      this.deployer = mainDeployer;
       this.deployments = new HashSet<Deployment>();
       this.shrinkWrapDeployer = shrinkWrapDeployer;
    }
 
    protected JBossEJBContainerBase(final Map<?, ?> properties, final MCServer server)
    {
-      this(properties, ClassPathEjbJarScanner.getEjbJars(), server);
+      this(properties, server, ClassPathEjbJarScanner.getEjbJars());
    }
 
    //-------------------------------------------------------------------------------------||
@@ -147,7 +143,7 @@ public abstract class JBossEJBContainerBase extends EJBContainer implements JBos
     * Deploys the specified {@link Deployment}s into the Container
     * 
     * @param deployments One or more {@link Deployment}s to process
-    * @throws DeploymentException If an error occured in deployment
+    * @throws DeploymentException If an error occurred in deployment
     * @throws IllegalArgumentException If at least one {@link Deployment} was not specified
     */
    protected void deploy(final Deployment... deployments) throws EJBDeploymentException, IllegalArgumentException

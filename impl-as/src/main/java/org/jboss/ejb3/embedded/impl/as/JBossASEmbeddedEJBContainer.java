@@ -36,7 +36,7 @@ public final class JBossASEmbeddedEJBContainer extends JBossEJBContainerBase
 
    public JBossASEmbeddedEJBContainer(final Map<?, ?> properties, final String[] modules)
    {
-      super(properties, modules, EmbeddedEJBContainerASAdaptor.getMCServer());
+      super(properties, EmbeddedEJBContainerASAdaptor.getMCServer(), modules);
    }
 
    @Override

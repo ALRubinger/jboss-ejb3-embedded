@@ -22,8 +22,6 @@
 
 package org.jboss.ejb3.embedded.impl.base;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
@@ -43,8 +41,8 @@ import org.jboss.ejb3.embedded.api.EJBDeploymentException;
 import org.jboss.ejb3.embedded.api.JBossEJBContainer;
 import org.jboss.kernel.spi.dependency.KernelController;
 import org.jboss.reloaded.api.ReloadedDescriptors;
-import org.jboss.shrinkwrap.api.Asset;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.vdf.api.ShrinkWrapDeployer;
 import org.junit.AfterClass;
@@ -110,8 +108,8 @@ public class JBossEJBContainerBaseUnitTest
    @Before
    public void createEJBContainer()
    {
-      ejbContainer = new TestJBossEJBContainer(new HashMap<Object, Object>(), new String[]
-      {}, server);
+      ejbContainer = new TestJBossEJBContainer(new HashMap<Object, Object>(), server, new String[]
+      {});
    }
 
    /**
@@ -141,17 +139,13 @@ public class JBossEJBContainerBaseUnitTest
    public void shrinkWrapDeployment()
    {
       // Create a test archive which installs a POJO into MC
-      final JavaArchive archive = ShrinkWrap.create("pojo.jar", JavaArchive.class).addClasses(Pojo.class).addResource(
-            new Asset()
-            {
-               @Override
-               public InputStream openStream()
-               {
-                  return new ByteArrayInputStream(
-                        ("<?xml version=\"1.0\" encoding=\"UTF-8\"?><deployment xmlns=\"urn:jboss:bean-deployer:2.0\"><bean name=\"Pojo\" class=\""
-                              + Pojo.class.getName() + "\" /></deployment>").getBytes());
-               }
-            }, "pojo-jboss-beans.xml");
+      final JavaArchive archive = ShrinkWrap
+            .create(JavaArchive.class)
+            .addClasses(Pojo.class)
+            .addResource(
+                  new StringAsset(
+                        "<?xml version=\"1.0\" encoding=\"UTF-8\"?><deployment xmlns=\"urn:jboss:bean-deployer:2.0\"><bean name=\"Pojo\" class=\""
+                              + Pojo.class.getName() + "\" /></deployment>"), "pojo-jboss-beans.xml");
 
       // Deploy it
       try
@@ -193,7 +187,7 @@ public class JBossEJBContainerBaseUnitTest
    {
 
       // Install the naming server into MC
-      final JavaArchive namingServer = ShrinkWrap.create("namingServer.jar", JavaArchive.class).addResource(
+      final JavaArchive namingServer = ShrinkWrap.create(JavaArchive.class, "namingServer.jar").addResource(
             "naming-server-jboss-beans.xml");
       ejbContainer.deploy(namingServer);
 
@@ -228,9 +222,9 @@ public class JBossEJBContainerBaseUnitTest
    private static class TestJBossEJBContainer extends JBossEJBContainerBase
    {
 
-      TestJBossEJBContainer(final Map<?, ?> properties, final String[] modules, final MCServer server)
+      TestJBossEJBContainer(final Map<?, ?> properties, final MCServer server, final String[] modules)
       {
-         super(properties, modules, server);
+         super(properties, server, modules);
       }
 
       /**
