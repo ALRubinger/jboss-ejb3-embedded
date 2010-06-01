@@ -36,12 +36,58 @@
   </properties>
 
   <dependencies>
+
+    <dependency>
+      <groupId>org.jboss.ejb3.embedded</groupId>
+      <artifactId>jboss-ejb3-embedded-impl-base</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.jboss.ejb3.embedded</groupId>
+      <artifactId>jboss-ejb3-embedded-api-shrinkwrap</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     
     <dependency>
       <groupId>org.jboss.shrinkwrap</groupId>
-      <artifactId>shrinkwrap-api</artifactId>
+      <artifactId>shrinkwrap-api</artifactId> 
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.shrinkwrap</groupId>
+      <artifactId>shrinkwrap-impl-base</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.shrinkwrap</groupId>
+      <artifactId>shrinkwrap-extension-vfs3</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.shrinkwrap</groupId>
+      <artifactId>shrinkwrap-extension-vdf</artifactId>
     </dependency>
 
+    <!-- JBoss Threads (needed for as long as we've got ShrinkWrapDeployer in use) -->
+    <dependency>
+      <groupId>org.jboss.threads</groupId>
+      <artifactId>jboss-threads</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.threads</groupId>
+      <artifactId>jboss-threads-metadata</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.jboss</groupId>
+      <artifactId>jboss-vfs</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
     
   </dependencies>
 </project>

@@ -20,35 +20,29 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.ejb3.embedded.api;
+package org.jboss.ejb3.embedded.spi;
 
-import javax.ejb.embeddable.EJBContainer;
-import javax.naming.Context;
+import org.jboss.bootstrap.api.mc.server.MCBasedServer;
+import org.jboss.bootstrap.api.mc.server.MCServer;
+import org.jboss.ejb3.embedded.api.JBossEJBContainer;
 
 /**
- * End-user view of JBoss {@link EJBContainer} implementation.
+ * Contract for implementations of {@link JBossEJBContainer}
+ * not visible to end-users 
  * 
  * @author <a href="mailto:andrew.rubinger@jboss.org">ALR</a>
  * @version $Revision: $
  */
-public interface JBossEJBContainer
+public interface JBossEJBContainerProvider extends JBossEJBContainer
 {
+
    //-------------------------------------------------------------------------------------||
    // Contracts --------------------------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
 
    /**
-    * Retrieve a naming context for looking up references to session beans 
-    * executing in the embeddable container.
-    * @see {@link EJBContainer#getContext()}
+    * Exposes the underlying {@link MCServer}
+    * @return
     */
-   Context getContext();
-
-   /**
-    * Shutdown an embeddable EJBContainer instance. 
-    * Embeddable applications should always call close() in order to free up the resources 
-    * associated with the embeddable container. 
-    * @see {@link EJBContainer#close()}
-    */
-   void close();
+   MCBasedServer<?, ?> getMCServer();
 }

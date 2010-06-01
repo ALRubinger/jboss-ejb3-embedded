@@ -34,6 +34,8 @@
     <version.org.jboss.logging>2.2.0.CR1</version.org.jboss.logging>
     <version.org.jboss.shrinkwrap>1.0.0-SNAPSHOT</version.org.jboss.shrinkwrap>
     <version.org.jboss.vfs>3.0.0.CR5</version.org.jboss.vfs>
+    <version.org.jboss.threads>2.0.0.CR4</version.org.jboss.threads>
+    <version.org.jboss_jboss.mdr>2.2.0.Alpha2</version.org.jboss_jboss.mdr>
 
   </properties>
 
@@ -188,6 +190,23 @@
         <groupId>org.jboss.shrinkwrap</groupId>
         <artifactId>shrinkwrap-extension-vfs3</artifactId>
         <version>${version.org.jboss.shrinkwrap}</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.jboss.threads</groupId>
+        <artifactId>jboss-threads</artifactId>
+        <version>${version.org.jboss.threads}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.threads</groupId>
+        <artifactId>jboss-threads-metadata</artifactId>
+        <version>${version.org.jboss.threads}</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.jboss</groupId>
+        <artifactId>jboss-mdr</artifactId>
+        <version>${version.org.jboss_jboss.mdr}</version>
       </dependency>
 
     </dependencies>

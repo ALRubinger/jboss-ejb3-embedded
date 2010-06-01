@@ -20,37 +20,42 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.ejb3.embedded.impl.base;
+package org.jboss.ejb3.embedded.impl.shrinkwrap;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.naming.Context;
-
-import junit.framework.Assert;
+import junit.framework.TestCase;
 
 import org.jboss.bootstrap.api.descriptor.BootstrapDescriptor;
+import org.jboss.bootstrap.api.descriptor.UrlBootstrapDescriptor;
 import org.jboss.bootstrap.api.lifecycle.LifecycleState;
 import org.jboss.bootstrap.api.mc.server.MCServer;
 import org.jboss.bootstrap.api.mc.server.MCServerFactory;
-import org.jboss.ejb3.embedded.api.JBossEJBContainer;
+import org.jboss.ejb3.embedded.api.EJBDeploymentException;
+import org.jboss.ejb3.embedded.api.shrinkwrap.ShrinkWrapEJBContainer;
+import org.jboss.ejb3.embedded.impl.base.JBossEJBContainerBase;
+import org.jboss.kernel.spi.dependency.KernelController;
 import org.jboss.reloaded.api.ReloadedDescriptors;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.StringAsset;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * Ensures that the {@link JBossEJBContainerProviderBase} 
- * implementation is working as contracted by {@link JBossEJBContainer}
+ * Ensures that the {@link ShrinkWrapEJBContainerImpl} 
+ * implementation is working as contracted by {@link ShrinkWrapEJBContainer}
  * 
  * @author <a href="mailto:andrew.rubinger@jboss.org">ALR</a>
  * @version $Revision: $
  */
-public class JBossEJBContainerBaseUnitTest
+public class ShrinkWrapEJBContainerImplUnitTest
 {
 
    //-------------------------------------------------------------------------------------||
@@ -67,9 +72,9 @@ public class JBossEJBContainerBaseUnitTest
    //-------------------------------------------------------------------------------------||
 
    /**
-    * {@link JBossEJBContainer} instance under test
+    * {@link ShrinkWrapEJBContainer} instance under test
     */
-   private JBossEJBContainerBase ejbContainer;
+   private ShrinkWrapEJBContainer ejbContainer;
 
    //-------------------------------------------------------------------------------------||
    // Lifecycle --------------------------------------------------------------------------||
@@ -86,6 +91,9 @@ public class JBossEJBContainerBaseUnitTest
       final List<BootstrapDescriptor> descriptors = server.getConfiguration().getBootstrapDescriptors();
       descriptors.add(ReloadedDescriptors.getClassLoadingDescriptor());
       descriptors.add(ReloadedDescriptors.getVdfDescriptor());
+      descriptors.add(ReloadedDescriptors.getThreadsDescriptor());
+      descriptors.add(new UrlBootstrapDescriptor(Thread.currentThread().getContextClassLoader().getResource(
+            "shrinkwrap-deployer-jboss-beans.xml")));
 
       // Start
       server.start();
@@ -98,8 +106,9 @@ public class JBossEJBContainerBaseUnitTest
    @Before
    public void createEJBContainer()
    {
-      ejbContainer = new TestJBossEJBContainer(new HashMap<Object, Object>(), server, new String[]
-      {});
+      ejbContainer = new ShrinkWrapEJBContainerImpl(new TestJBossEJBContainer(new HashMap<Object, Object>(), server,
+            new String[]
+            {}));
    }
 
    /**
@@ -121,32 +130,48 @@ public class JBossEJBContainerBaseUnitTest
    //-------------------------------------------------------------------------------------||
 
    /**
-    * Ensures we honor {@link JBossEJBContainer#getContext()}
-    * @throws Exception
+    * Ensures that ShrinkWrap deployments are delegated along as expected
     */
    @Test
-   public void jndiContextFromEjbContainer() throws Exception
+   public void shrinkWrapDeployment()
    {
+      // Create a test archive which installs a POJO into MC
+      final JavaArchive archive = ShrinkWrap
+            .create(JavaArchive.class)
+            .addClasses(Pojo.class)
+            .addResource(
+                  new StringAsset(
+                        "<?xml version=\"1.0\" encoding=\"UTF-8\"?><deployment xmlns=\"urn:jboss:bean-deployer:2.0\"><bean name=\"Pojo\" class=\""
+                              + Pojo.class.getName() + "\" /></deployment>"), "pojo-jboss-beans.xml");
 
-      // Install the naming server into MC;
-      final File namingServerDeploymentFile = new File(Thread.currentThread().getContextClassLoader().getResource(
-            "naming-server-jboss-beans.xml").toURI());
-      ejbContainer.deploy(namingServerDeploymentFile.toURI().toURL());
+      // Deploy it
+      try
+      {
+         ejbContainer.deploy(archive);
+      }
+      catch (final EJBDeploymentException e)
+      {
+         TestCase.fail("Could not deploy " + archive.toString() + ": " + e);
+      }
 
-      // Get a Context via the EJB Container
-      final Context context = ejbContainer.getContext();
-      Assert.assertNotNull("Got null JNDI context from EJB Container", context);
+      // Ensure it was deployed
+      final KernelController controller = server.getKernel().getController();
+      final boolean installed = controller.getContextByClass(Pojo.class) != null;
+      Assert.assertTrue("Archive was not deployed", installed);
 
-      // Bind into JNDI
-      final Object objectToBind = new Pojo();
-      final String bindName = "bindName";
-      context.bind(bindName, objectToBind);
+      // Remove
+      try
+      {
+         ejbContainer.undeploy(archive);
+      }
+      catch (final EJBDeploymentException e)
+      {
+         TestCase.fail("Could not undeploy " + archive.toString() + ": " + e);
+      }
 
-      // Ensure we've bound correctly by looking up from JNDI as a round trip
-      Assert.assertSame("Object bound was not as expected", objectToBind, context.lookup(bindName));
-
-      // Undeploy the JNDI server
-      ejbContainer.undeploy(namingServerDeploymentFile.toURI().toURL());
+      // Ensure it was removed
+      final boolean removed = controller.getContextByClass(Pojo.class) == null;
+      Assert.assertTrue("Archive was not undeployed", removed);
 
    }
 

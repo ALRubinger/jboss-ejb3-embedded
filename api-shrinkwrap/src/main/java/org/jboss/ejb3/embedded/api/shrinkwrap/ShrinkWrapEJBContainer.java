@@ -20,35 +20,38 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.ejb3.embedded.api;
+package org.jboss.ejb3.embedded.api.shrinkwrap;
 
 import javax.ejb.embeddable.EJBContainer;
-import javax.naming.Context;
+
+import org.jboss.ejb3.embedded.api.EJBDeploymentException;
+import org.jboss.ejb3.embedded.api.JBossEJBContainer;
+import org.jboss.shrinkwrap.api.Archive;
 
 /**
- * End-user view of JBoss {@link EJBContainer} implementation.
+ * End-user view of JBoss {@link EJBContainer} implementation
+ * capable of deploying/undeploying  ShrinkWrap {@link Archive}s. 
+ * In addition to exposing some support within {@link EJBContainer},
+ * this makes available explicit user deployment and undeployment.
  * 
  * @author <a href="mailto:andrew.rubinger@jboss.org">ALR</a>
  * @version $Revision: $
  */
-public interface JBossEJBContainer
+public interface ShrinkWrapEJBContainer extends JBossEJBContainer
 {
-   //-------------------------------------------------------------------------------------||
-   // Contracts --------------------------------------------------------------------------||
-   //-------------------------------------------------------------------------------------||
+   /**
+    * Deploys the specified {@link Archive}s into the container. 
+    * @param archives
+    * @throws EJBDeploymentException If an error occurred in deployment
+    * @throws IllegalArgumentException If archives is null
+    */
+   void deploy(Archive<?>... archives) throws EJBDeploymentException, IllegalArgumentException;
 
    /**
-    * Retrieve a naming context for looking up references to session beans 
-    * executing in the embeddable container.
-    * @see {@link EJBContainer#getContext()}
+    * Undeploys the specified {@link Archive}s from the container.  
+    * @param archives
+    * @throws EJBDeploymentException If an error occurred in deployment
+    * @throws IllegalArgumentException If archives is null
     */
-   Context getContext();
-
-   /**
-    * Shutdown an embeddable EJBContainer instance. 
-    * Embeddable applications should always call close() in order to free up the resources 
-    * associated with the embeddable container. 
-    * @see {@link EJBContainer#close()}
-    */
-   void close();
+   void undeploy(Archive<?>... archives) throws EJBDeploymentException, IllegalArgumentException;
 }

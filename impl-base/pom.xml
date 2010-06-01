@@ -27,11 +27,7 @@
   
   </build>
   
-  <properties>
-  
-    <!-- Versioning -->
-     <version.org.jboss.threads>2.0.0.CR4</version.org.jboss.threads>
-     
+  <properties>     
 
   </properties>
 
@@ -47,11 +43,6 @@
       <groupId>org.jboss</groupId>
       <artifactId>jboss-vfs</artifactId>
       <scope>provided</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.jboss.reloaded</groupId>
-      <artifactId>jboss-reloaded-vdf-bootstrap-minimal</artifactId>
     </dependency>
     
     <dependency>
@@ -74,24 +65,10 @@
       <artifactId>shrinkwrap-extension-vfs3</artifactId>
       <scope>test</scope>
     </dependency>
+    
     <dependency>
-      <groupId>org.jboss.shrinkwrap</groupId>
-      <artifactId>shrinkwrap-extension-vdf</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <!-- JBoss Threads (needed for as long as we've got ShrinkWrapDeployer in use) -->
-    <dependency>
-      <groupId>org.jboss.threads</groupId>
-      <artifactId>jboss-threads</artifactId>
-      <version>${version.org.jboss.threads}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.threads</groupId>
-      <artifactId>jboss-threads-metadata</artifactId>
-      <version>${version.org.jboss.threads}</version>
-      <scope>test</scope>
+      <groupId>org.jboss.reloaded</groupId>
+      <artifactId>jboss-reloaded-vdf-bootstrap-minimal</artifactId>
     </dependency>
     
     <dependency>

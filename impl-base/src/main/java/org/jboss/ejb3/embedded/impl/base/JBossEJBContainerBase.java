@@ -21,10 +21,10 @@
  */
 package org.jboss.ejb3.embedded.impl.base;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -42,12 +42,10 @@ import org.jboss.deployers.spi.DeploymentException;
 import org.jboss.deployers.vfs.spi.client.VFSDeployment;
 import org.jboss.deployers.vfs.spi.client.VFSDeploymentFactory;
 import org.jboss.ejb3.embedded.api.EJBDeploymentException;
-import org.jboss.ejb3.embedded.api.JBossEJBContainer;
 import org.jboss.ejb3.embedded.impl.base.scanner.ClassPathEjbJarScanner;
+import org.jboss.ejb3.embedded.spi.JBossEJBContainerProvider;
 import org.jboss.kernel.Kernel;
 import org.jboss.logging.Logger;
-import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.vdf.api.ShrinkWrapDeployer;
 import org.jboss.vfs.VFS;
 import org.jboss.vfs.VirtualFile;
 
@@ -55,11 +53,13 @@ import org.jboss.vfs.VirtualFile;
  * Base for JBoss {@link EJBContainer}s.  Provides
  * support for deployment operations backed by a supplied {@link MCServer}
  * to be provided by concrete implementations.
+ * 
+ * Not thread-safe.
  *
  * @author <a href="mailto:andrew.rubinger@jboss.org">ALR</a>
  * @version $Revision: $
  */
-public abstract class JBossEJBContainerBase extends EJBContainer implements JBossEJBContainer
+public abstract class JBossEJBContainerBase extends EJBContainer implements JBossEJBContainerProvider
 {
 
    //-------------------------------------------------------------------------------------||
@@ -88,13 +88,7 @@ public abstract class JBossEJBContainerBase extends EJBContainer implements JBos
    /**
     * All deployments currently installed via this container
     */
-   private final Set<Deployment> deployments;
-
-   /**
-    * @see @see http://community.jboss.org/message/540998
-    */
-   @Deprecated
-   private final ShrinkWrapDeployer shrinkWrapDeployer;
+   private final Map<URL, Deployment> deployments;
 
    //-------------------------------------------------------------------------------------||
    // Constructor ------------------------------------------------------------------------||
@@ -110,11 +104,6 @@ public abstract class JBossEJBContainerBase extends EJBContainer implements JBos
       // Get Kernel
       final Kernel kernel = server.getKernel();
 
-      // Obtain ShrinkWrapDeployer
-      final ShrinkWrapDeployer shrinkWrapDeployer = (ShrinkWrapDeployer) kernel.getController().getContextByClass(
-            ShrinkWrapDeployer.class).getTarget();
-      assert shrinkWrapDeployer != null : "ShrinkWrapDeployer found in Kernel was null";
-
       // Obtain MainDeployer
       final MainDeployer mainDeployer = (MainDeployer) kernel.getController().getContextByClass(MainDeployer.class)
             .getTarget();
@@ -126,8 +115,7 @@ public abstract class JBossEJBContainerBase extends EJBContainer implements JBos
       // Set
       this.mcServer = server;
       this.deployer = mainDeployer;
-      this.deployments = new HashSet<Deployment>();
-      this.shrinkWrapDeployer = shrinkWrapDeployer;
+      this.deployments = new HashMap<URL, Deployment>();
    }
 
    protected JBossEJBContainerBase(final Map<?, ?> properties, final MCServer server)
@@ -155,7 +143,7 @@ public abstract class JBossEJBContainerBase extends EJBContainer implements JBos
       }
 
       // Mark deployments added
-      final Set<Deployment> deploymentsAdded = new HashSet<Deployment>();
+      final Set<Deployment> deploymentsAdded = new HashSet<Deployment>(deployments.length);
 
       // Add all deployments
       for (final Deployment deployment : deployments)
@@ -204,30 +192,72 @@ public abstract class JBossEJBContainerBase extends EJBContainer implements JBos
       {
          throw EJBDeploymentException.newInstance("Processing the pending deployments resulted in error", e);
       }
+   }
 
-      // Mark we've got new deployments
-      this.deployments.addAll(deploymentsAdded);
+   /**
+    * Undeploys the specified {@link Deployment}s into the Container
+    * 
+    * @param deployments One or more {@link Deployment}s to undeploy
+    * @throws DeploymentException If an error occurred in deployment
+    * @throws IllegalArgumentException If at least one {@link Deployment} was not specified
+    */
+   protected void undeploy(final Deployment... deployments) throws EJBDeploymentException, IllegalArgumentException
+   {
+      // Precondition checks
+      if (deployments == null || deployments.length == 0)
+      {
+         throw new IllegalArgumentException("At least one deployment must be specified");
+      }
 
+      // Add all deployments
+      for (final Deployment deployment : deployments)
+      {
+         if (log.isTraceEnabled())
+         {
+            log.tracef("Removing deployment: ", deployment);
+         }
+         try
+         {
+            // Remove from the deployer
+            deployer.removeDeployment(deployment);
+         }
+         catch (final DeploymentException mainDeploymentException)
+         {
+            // Translate exception to our API
+            throw EJBDeploymentException.newInstance("Could not remove deployment: " + deployment,
+                  mainDeploymentException);
+         }
+      }
+
+      // Process and ensure everything's OK
+      deployer.process();
+      try
+      {
+         deployer.checkComplete();
+      }
+      catch (final DeploymentException e)
+      {
+         throw EJBDeploymentException.newInstance("Processing the removed deployments resulted in error", e);
+      }
    }
 
    /**
     * Deploys the specified {@link URL}s into the Container
     * 
-    * @param urls URLs to deploy; at least one must be specified
-    * @throws DeploymentException If an error occurred during deployment
-    * @throws IOException
+    * @param urls URLs to deploy; must be specified, even if empty
+    * @throws EJBDeploymentException If an error occurred during deployment
     * @throws IllegalArgumentException
     */
    protected void deploy(final URL... urls) throws EJBDeploymentException, IllegalArgumentException
    {
       // Precondition checks
-      if (urls == null || urls.length == 0)
+      if (urls == null)
       {
-         throw new IllegalArgumentException("At least one URL for deployment must be specified");
+         throw new IllegalArgumentException("URLs must be specified");
       }
 
       // Hold the deployments
-      final Deployment[] deployments = new Deployment[urls.length];
+      final Map<URL, Deployment> newDeployments = new HashMap<URL, Deployment>(urls.length);
 
       // For each URL, make a Deployment
       for (int i = 0; i < urls.length; i++)
@@ -243,70 +273,71 @@ public abstract class JBossEJBContainerBase extends EJBContainer implements JBos
             throw new RuntimeException("Could not create a virtual file to deploy from URL: " + url, urise);
          }
          final VFSDeployment deployment = VFSDeploymentFactory.getInstance().createVFSDeployment(root);
-         deployments[i] = deployment;
+         newDeployments.put(url, deployment);
       }
 
       // Delegate to real deployment
-      this.deploy(deployments);
+      this.deploy(newDeployments.values().toArray(new Deployment[]
+      {}));
+
+      // Mark these are done
+      this.deployments.putAll(newDeployments);
    }
 
    /**
-    * {@inheritDoc}
-    * @see org.jboss.ejb3.embedded.api.JBossEJBContainer#deploy(org.jboss.shrinkwrap.api.Archive<?>[])
+    * Undeploys the specified {@link URL}s from the Container.  If a {@link URL}
+    * is specified that has not been previously deployed via this view, it will be ignored.
+    * 
+    * @param urls URLs to undeploy; at least one must be specified
+    * @throws EJBDeploymentException If an error occurred during deployment
+    * @throws IllegalArgumentException
     */
-   @Override
-   public void deploy(final Archive<?>... archives) throws EJBDeploymentException, IllegalArgumentException
+   protected void undeploy(final URL... urls) throws EJBDeploymentException, IllegalArgumentException
    {
       // Precondition checks
-      if (archives == null)
+      if (urls == null)
       {
-         throw new IllegalArgumentException("archives must be supplied");
+         throw new IllegalArgumentException("URLs must be specified");
       }
 
-      // Deploy
-      try
+      // Get the Deployments for the URLs
+      final Set<Deployment> deploymentsToRemove = new HashSet<Deployment>();
+      final Set<URL> urlsToUnregister = new HashSet<URL>();
+      for (final URL url : urls)
       {
-         shrinkWrapDeployer.deploy(archives);
-      }
-      catch (final DeploymentException e)
-      {
-         // Translate
-         throw EJBDeploymentException.newInstance("Could not deploy " + Arrays.asList(archives), e);
-      }
-   }
-
-   /**
-    * {@inheritDoc}
-    * @see org.jboss.ejb3.embedded.api.JBossEJBContainer#undeploy(org.jboss.shrinkwrap.api.Archive<?>[])
-    */
-   @Override
-   public void undeploy(final Archive<?>... archives) throws EJBDeploymentException, IllegalArgumentException
-   {
-      // Precondition checks
-      if (archives == null)
-      {
-         throw new IllegalArgumentException("archives must be supplied");
+         // Lookup
+         final Deployment deployment = this.deployments.get(url);
+         if (deployment == null)
+         {
+            if (log.isDebugEnabled())
+            {
+               log.debug("Ignoring undeployment request of " + url.toExternalForm()
+                     + "; has not been previously deployed via " + this);
+            }
+         }
+         else
+         {
+            deploymentsToRemove.add(deployment);
+            urlsToUnregister.add(url);
+         }
       }
 
       // Undeploy
-      try
+      this.undeploy(deploymentsToRemove.toArray(new Deployment[]
+      {}));
+      // Mark removed
+      for (final URL url : urlsToUnregister)
       {
-         shrinkWrapDeployer.undeploy(archives);
+         this.deployments.remove(url);
       }
-      catch (final DeploymentException e)
-      {
-         // Translate
-         throw EJBDeploymentException.newInstance("Could not undeploy " + Arrays.asList(archives), e);
-      }
+
    }
 
    /**
-    * Exposes the underlying {@link MCServer} to children; take care not to expose this to 
-    * end users (clients).
-    * 
-    * @return
+    * {@inheritDoc}
+    * @see org.jboss.ejb3.embedded.spi.JBossEJBContainerProvider#getMCServer()
     */
-   protected MCBasedServer<?, ?> getMCServer()
+   public MCBasedServer<?, ?> getMCServer()
    {
       return mcServer;
    }

@@ -38,7 +38,7 @@
   <dependencies>
   
     <!-- 
-    Dependencies: org.jboss.ejb3 
+    Dependencies: org.jboss.ejb3.embedded
     -->
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -48,11 +48,11 @@
     
     
     <!-- 
-    Dependencies: External to EJB3 
+    Dependencies: External to EJB3 Embedded 
     -->
     <dependency>
-      <groupId>org.jboss.kernel</groupId>
-      <artifactId>jboss-kernel</artifactId>
+      <groupId>org.jboss.reloaded</groupId>
+      <artifactId>jboss-reloaded-vdf-bootstrap-minimal</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
