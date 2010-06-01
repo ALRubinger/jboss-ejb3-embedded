@@ -1,0 +1,48 @@
+<!--
+  vi:ts=2:sw=2:expandtab
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <!-- Define Parent -->
+  <parent>
+    <groupId>org.jboss.ejb3.embedded</groupId>
+    <artifactId>jboss-ejb3-embedded-build</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../build/pom.xml</relativePath>
+  </parent>
+
+  <!-- Maven POM Model Version -->
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- Artifact Information -->
+  <artifactId>jboss-ejb3-embedded-api-shrinkwrap</artifactId>
+  <packaging>jar</packaging>
+  <name>JBoss EJB 3.1+ Embedded API ShrinkWrap Extension</name>
+  <description>Application Programming Interface for JBoss Embedded EJB 3.1+ Container with ShrinkWrap Extensions</description>
+
+  <!-- Build Configuration -->
+  <build>
+  
+    
+  </build>
+  
+  <properties>
+  
+    <!-- Versioning -->
+
+  
+  </properties>
+
+  <dependencies>
+    
+    <dependency>
+      <groupId>org.jboss.ejb3.embedded</groupId>
+      <artifactId>jboss-ejb3-embedded-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    
+  </dependencies>
+</project>
