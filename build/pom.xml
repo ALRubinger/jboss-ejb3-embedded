@@ -18,7 +18,7 @@
   <!-- Artifact Configuration -->
   <groupId>org.jboss.ejb3.embedded</groupId>
   <artifactId>jboss-ejb3-embedded-build</artifactId>
-  <version>1.0.0-alpha-1</version>
+  <version>1.0.0-SNAPSHOT</version>
   <name>JBoss EJB 3.1+ Embedded Build</name>
   <description>Centralized Build Configuration for JBoss Embedded EJB 3.1+ Container Support</description>
   <packaging>pom</packaging>
@@ -32,7 +32,7 @@
     <version.org.jboss.kernel>2.2.0.Alpha9</version.org.jboss.kernel>
     <version.org.jboss.spec.javax.ejb_jboss-ejb-api_3.1_spec>1.0.0.Beta2</version.org.jboss.spec.javax.ejb_jboss-ejb-api_3.1_spec>
     <version.org.jboss.logging>2.2.0.CR1</version.org.jboss.logging>
-    <version.org.jboss.shrinkwrap>1.0.0-alpha-10</version.org.jboss.shrinkwrap>
+    <version.org.jboss.shrinkwrap>1.0.0-SNAPSHOT0</version.org.jboss.shrinkwrap>
     <version.org.jboss.vfs>3.0.0.CR5</version.org.jboss.vfs>
     <version.org.jboss.threads>2.0.0.CR4</version.org.jboss.threads>
     <version.org.jboss_jboss.mdr>2.2.0.Alpha2</version.org.jboss_jboss.mdr>
