@@ -9,7 +9,7 @@
   <parent>
     <groupId>org.jboss.ejb3.embedded</groupId>
     <artifactId>jboss-ejb3-embedded-build</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0-alpha-1</version>
     <relativePath>../build/pom.xml</relativePath>
   </parent>
 
